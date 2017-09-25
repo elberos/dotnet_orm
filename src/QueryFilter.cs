@@ -24,6 +24,13 @@ namespace Elberos.Orm{
 		public string type = "";
 		public string key = "";
 		public dynamic value = "";
+		
+		public QueryFilter(string key, string type, dynamic value){
+			this.key = key;
+			this.type = type;
+			this.value = value;
+		}
+		
 	}
 	
 }

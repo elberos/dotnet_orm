@@ -27,6 +27,9 @@ namespace Elberos.Orm{
 			this._connections.Remove(api_name);
 		}
 		public Connection get(string api_name){
+			if (api_name == null)
+				api_name = "default";
+			
 			if (!this._connections.ContainsKey(api_name))
 				return null;
 			return this._connections[api_name];

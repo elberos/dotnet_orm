@@ -14,7 +14,7 @@ namespace Elberos.Orm{
 	
 	public class QueryResult {
 		
-		public string entity_name = "";
+		public Type entity_repository_name = null;
 		public QueryBuilder qb = null;
 		public DbDataReader data = null;
 		public long page = 0;

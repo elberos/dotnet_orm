@@ -8,6 +8,7 @@
  */
  
 using System;
+using System.Data.Common;
 using Microsoft.Extensions.Configuration;
 
 namespace Elberos.Orm{

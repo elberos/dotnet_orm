@@ -40,6 +40,12 @@ namespace Elberos.Orm{
 		
 		
 		/**
+		 * Entity manager
+		 */
+		protected IEntityManager _em = null;
+		
+		
+		/**
 		 * Query alias
 		 */
 		protected string _alias = "t";
@@ -53,7 +59,7 @@ namespace Elberos.Orm{
 		protected long _page = -1;
 		
 		protected QueryResult _query_result = null;
-		protected string _entity_name = null;
+		protected Type _entity_repository_name = null;
 		protected int _found_rows = -1;
 		
 		protected List<QueryFilter> _filter = null;
@@ -62,10 +68,10 @@ namespace Elberos.Orm{
 		/**
 		 * Constructor
 		 */
-		public QueryBuilder(Connection connection){
+		public QueryBuilder(Connection connection, IEntityManager em){
 	        this._connection = connection;
+			this._em = em;
 	    }
-		
 		
 		
 		/**
@@ -75,6 +81,13 @@ namespace Elberos.Orm{
 			return this._connection;
 		}
 		
+		
+		/**
+		 * Get entity manager
+		 */
+		public virtual IEntityManager getEntityManager(){
+			return this._em;
+		}
 		
 		
 		/**
@@ -129,8 +142,8 @@ namespace Elberos.Orm{
 		 * @param string class_name The class name.
 		 * @return self
 		 */
-		public virtual QueryBuilder setEntity(string entity_name, string alias = null){
-			this._entity_name = entity_name;
+		public virtual QueryBuilder setEntityRepository(Type entity_repository_name, string alias = null){
+			this._entity_repository_name = entity_repository_name;
 			this.setAlias(alias);
 			return this;
 		}
@@ -475,7 +488,7 @@ namespace Elberos.Orm{
 				return this._query_result;
 			
 			this._query_result = new QueryResult();
-			this._query_result.entity_name = this._entity_name;
+			this._query_result.entity_repository_name = this._entity_repository_name;
 			this._query_result.qb = this;
 			this._query_result.data = this.getRawResult();
 			this._query_result.page = this.getCalcPage();
@@ -542,10 +555,10 @@ namespace Elberos.Orm{
 		/**
 		 * Set filter
 		 */
-		public virtual QueryBuilder filter(dynamic filter){
+		public virtual QueryBuilder filter(List<QueryFilter> filter){
 			
 			// Get where by recurse
-			//this._filter = filter;
+			this._filter = filter;
 			
 			return this;
 		}
@@ -555,10 +568,10 @@ namespace Elberos.Orm{
 		/**
 		 * Set filter
 		 */
-		public virtual QueryBuilder addFilter(string api_name, string op, dynamic value){
+		public virtual QueryBuilder addFilter(QueryFilter filter){
 			
 			// Get where by recurse
-			//this._filter[] = [api_name, op, value];
+			this._filter.Add(filter);
 			
 			return this;
 		}
