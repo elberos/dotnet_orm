@@ -25,7 +25,7 @@ namespace Elberos.Orm{
 		public abstract dynamic value();
 		public abstract void assign(dynamic value);
 		
-		public EntityBaseType(dynamic value, Entity entity, string field_name){
+		public EntityBaseType(Entity entity, string field_name){
 			this._entity = entity;
 			this._field_name = field_name;
 		}

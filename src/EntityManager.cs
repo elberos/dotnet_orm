@@ -99,8 +99,6 @@ namespace Elberos.Orm{
 				throw new System.Exception("entity_repository_name '" + 
 					(string)entity_repository_name + "' must be Type");
 			}
-			
-			return null;
 		}
 		
 		

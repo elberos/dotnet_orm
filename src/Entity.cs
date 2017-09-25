@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace Elberos.Orm{
 	
-	public abstract class Entity{
+	public abstract class Entity : IEntity{
 		
 		protected bool _is_new = true;
 		protected Dictionary<string, dynamic> _old_data = null;
@@ -203,7 +203,7 @@ namespace Elberos.Orm{
 		 * @param Connection connection
 		 * @return dynamic
 		 */
-		public dynamic getDatabaseValue(EntityFieldInfo field, Connection connection){
+		public virtual dynamic getDatabaseValue(EntityFieldInfo field, Connection connection){
 			IEntityManager em = EntityManager.getInstance();
 			string field_name = field.fieldName();
 			Type db_type = field.dbType();
@@ -231,7 +231,8 @@ namespace Elberos.Orm{
 		 * @param Connection connection
 		 * @param dynamic db_value
 		 */
-		public void setDatabaseValue(EntityFieldInfo field, Connection connection, dynamic db_value){
+		public virtual void setDatabaseValue(EntityFieldInfo field, Connection connection,
+				 dynamic db_value){
 			IEntityManager em = EntityManager.getInstance();
 			string field_name = field.fieldName();
 			Type db_type = field.dbType();
@@ -258,8 +259,8 @@ namespace Elberos.Orm{
 		 * @param dynamic default_value
 		 * @return dynamic
 		 */
-		public dynamic getValue(string field_name, dynamic default_value = null){
-			PropertyInfo property = GetType().GetProperty(field_name);
+		public virtual dynamic getValue(string field_name, dynamic default_value = null){
+			PropertyInfo property = this.GetType().GetProperty(field_name);
         	return property.GetValue(this, null);
 		}
 		
@@ -271,9 +272,9 @@ namespace Elberos.Orm{
 		 * @param dynamic value
 		 * @return dynamic
 		 */
-		public dynamic setValue(string field_name, dynamic value = null){
-			PropertyInfo property = GetType().GetProperty(field_name);
-        	return property.SetValue(this, value, null);
+		public virtual void setValue(string field_name, dynamic value = null){
+			PropertyInfo property = this.GetType().GetProperty(field_name);
+        	property.SetValue(this, value, null);
 		}
 		
 		
@@ -281,7 +282,7 @@ namespace Elberos.Orm{
 		 * Assign values
 		 * @param Dictionary<string, dynamic> data
 		 */
-		public void assignData(Dictionary<string, dynamic> data){
+		public virtual void assignData(Dictionary<string, dynamic> data){
 			foreach(KeyValuePair<string, dynamic> pair in data){
 				this.setValue(pair.Key, pair.Value);
 			}
@@ -292,7 +293,7 @@ namespace Elberos.Orm{
 		 * Assign values from database
 		 * @param DbDataReader data
 		 */
-		public void assignData(DbDataReader res){
+		public virtual void assignData(DbDataReader res){
 			IEntityManager em = EntityManager.getInstance();
 			Connection connection = em.getConnection(this.getConnectionName());
 			EntityRepository repo = em.getRepository(this.getEntityRepositoryType());
@@ -313,28 +314,28 @@ namespace Elberos.Orm{
 		/**
 		 * Events
 		 */
-		public void preCreate(){
+		public virtual void preCreate(){
 		}
 		
-		public void postCreate(){
+		public virtual void postCreate(){
 		}
 		
-		public void preUpdate(){
+		public virtual void preUpdate(){
 		}
 		
-		public void postUpdate(){
+		public virtual void postUpdate(){
 		}
 		
-		public void preRemove(){
+		public virtual void preRemove(){
 		}
 		
-		public void postRemove(){
+		public virtual void postRemove(){
 		}
 		
-		public void postLoad(){
+		public virtual void postLoad(){
 		}
 		
-		public void onInit(){
+		public virtual void onInit(){
 		}
 	}
 }
