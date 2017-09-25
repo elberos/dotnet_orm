@@ -28,28 +28,28 @@ namespace Elberos.Orm{
 		/**
 		 * Connect to DB
 		 */
-		public virtual async void connect(){}
+		public virtual void connect(){}
 		
 		
 		/**
 		 * Disconnect from DB
 		 */
-		public virtual async void disconnect(){}
+		public virtual void disconnect(){}
 		
 		
 		/**
 		 * Check DB connection
 		 */
-		public bool connected(){
+		public virtual bool connected(){
 			return this.is_connected;
 		}
 		
 		
-		public string escapeVar(string var){
+		public virtual string escapeVar(string var){
 			return var;
 		}
 		
-		public string escapeKey(string key){
+		public virtual string escapeKey(string key){
 			return key;
 		}
 		
@@ -57,9 +57,7 @@ namespace Elberos.Orm{
 		/**
 		 * Create query builder
 		 */
-		public QueryBuilder createQueryBuilder(){
-			return null;
-		}
+		public abstract QueryBuilder createQueryBuilder();
 		
 		
 		/**

@@ -40,12 +40,6 @@ namespace Elberos.Orm{
 		
 		
 		/**
-		 * Entity manager
-		 */
-		protected IEntityManager _em = null;
-		
-		
-		/**
 		 * Query alias
 		 */
 		protected string _alias = "t";
@@ -68,9 +62,8 @@ namespace Elberos.Orm{
 		/**
 		 * Constructor
 		 */
-		public QueryBuilder(Connection connection, IEntityManager em){
+		public QueryBuilder(Connection connection){
 	        this._connection = connection;
-			this._em = em;
 	    }
 		
 		
@@ -81,13 +74,6 @@ namespace Elberos.Orm{
 			return this._connection;
 		}
 		
-		
-		/**
-		 * Get entity manager
-		 */
-		public virtual IEntityManager getEntityManager(){
-			return this._em;
-		}
 		
 		
 		/**
@@ -142,22 +128,39 @@ namespace Elberos.Orm{
 		 * @param string class_name The class name.
 		 * @return self
 		 */
-		public virtual QueryBuilder setEntityRepository(Type entity_repository_name, string alias = null){
-			this._entity_repository_name = entity_repository_name;
-			this.setAlias(alias);
+		public virtual QueryBuilder setEntityRepository(dynamic entity_repository_name){
+			
+			if (entity_repository_name is string){
+				entity_repository_name = Type.GetType(entity_repository_name);
+			}
+			if (entity_repository_name is Type){
+				this._entity_repository_name = entity_repository_name;
+				
+				// Check if entity_repository_name is subclass of EntityRepository
+				if (!((Type)entity_repository_name).IsSubclassOf(typeof(EntityRepository))){
+					throw new System.Exception("entity_repository_name '" + 
+						(string)entity_repository_name + "' must be EntityRepository");
+				}
+			}
+			else {
+				throw new System.Exception("entity_repository_name '" + 
+					(string)entity_repository_name + "' must be Type");
+			}
+			
 			return this;
 		}
 		
 		
 		/**
-		 * Get table name from protected property this._entity_name
+		 * Get table name from protected property this._entity_repository_name
 		 *
 		 * @return string field_name with synonym
 		 */
 		public virtual string getTableName(){	
-			return "";	
-			//table_name = Engine::callStatic(this._entity_name, "getTableName");
-			//return table_name;
+			IEntityManager em = EntityManager.getInstance();
+			EntityRepository repo = em.getRepository(this._entity_repository_name);
+			string table_name = repo.getTableName();
+			return table_name;
 		}
 
 		
@@ -175,55 +178,55 @@ namespace Elberos.Orm{
 		/**
 		 * Build insert query
 		 *
-		 * @param string entity_name 
+		 * @param dynamic entity_repository_name 
 		 * @param string alias 
 		 * @return self
 		 */
-		public abstract QueryBuilder insert(string entity_name, string alias = null);
+		public abstract QueryBuilder insert(dynamic entity_repository_name, string alias = null);
 		
 		
 		
 		/**
 		 * Build update query
 		 *
-		 * @param string entity_name 
+		 * @param dynamic entity_repository_name 
 		 * @param string alias 
 		 * @return self
 		 */
-		public abstract QueryBuilder update(string entity_name, string alias = null);
+		public abstract QueryBuilder update(dynamic entity_repository_name, string alias = null);
 		
 		
 		
 		/**
 		 * Build insert or update query
 		 *
-		 * @param string entity_name 
+		 * @param dynamic entity_repository_name 
 		 * @param string alias 
 		 * @return self
 		 */
-		public abstract QueryBuilder insertOrUpdate(string entity_name, string alias = null);
+		public abstract QueryBuilder insertOrUpdate(dynamic entity_repository_name, string alias = null);
 		
 		
 		
 		/**
 		 * Build delete query
 		 *
-		 * @param string entity_name 
+		 * @param dynamic entity_repository_name 
 		 * @param string alias 
 		 * @return self
 		 */
-		public abstract QueryBuilder delete(string entity_name, string alias = null);
+		public abstract QueryBuilder delete(dynamic entity_repository_name, string alias = null);
 		
 		
 		
 		/**
 		 * Set table name
 		 *
-		 * @param string from 
+		 * @param dynamic entity_repository_name 
 		 * @param string alias 
 		 * @return self
 		 */
-		public abstract QueryBuilder from(string from, string alias = null);
+		public abstract QueryBuilder from(dynamic entity_repository_name, string alias = null);
 		
 		
 		
@@ -329,7 +332,7 @@ namespace Elberos.Orm{
 		 * @param array arr The array of key => value
 		 * @return self
 		 */
-		public abstract QueryBuilder setValues(KeyValuePair<string, dynamic>[] arr);
+		public abstract QueryBuilder setValues(Dictionary<string, dynamic> arr);
 		
 		
 		
@@ -339,7 +342,7 @@ namespace Elberos.Orm{
 		 * @param array arr Order list
 		 * @return self
 		 */
-		public abstract QueryBuilder order(KeyValuePair<string, string>[] arr);
+		public abstract QueryBuilder order(Dictionary<string, long> arr);
 		
 		
 		
@@ -440,7 +443,7 @@ namespace Elberos.Orm{
 		 *
 		 * @return self
 		 */
-		public virtual async Task<QueryBuilder> execute(){
+		public virtual Task<QueryBuilder> execute(){
 			return null;
 		}
 		
@@ -602,6 +605,14 @@ namespace Elberos.Orm{
 			return this;
 		}
 		
+		
+		
+		/**
+		 * Get SQL query
+		 *
+		 * @return string
+		 */
+		public abstract dynamic getQuery();
 		
 	}
 }

@@ -16,15 +16,9 @@ namespace Elberos.Orm{
 	
 	public abstract class Entity{
 		
-		protected IServiceProvider services = null;
 		protected bool _is_new = true;
 		protected Dictionary<string, dynamic> _old_data = null;
 		protected string _connection_name = null;
-		
-		
-		public Entity(IServiceProvider provider){
-			this.services = provider;
-		}
 		
 		
 		/**

@@ -36,12 +36,9 @@ namespace Elberos.Orm{
 		}
 		
 		
-		public void Configure(IConfiguration config){
-			IConfigurationSection configConnections = config.GetSection("Connections");
-			if (configConnections == null)
-				return;
+		public void Configure(IConfigurationSection config){
 			
-			foreach (IConfigurationSection section in configConnections.GetChildren()){
+			foreach (IConfigurationSection section in config.GetChildren()){
 				string name = section["name"];
 				string type = section["type"];
 				Type the_type = Type.GetType(type);
@@ -50,7 +47,6 @@ namespace Elberos.Orm{
 				connection.Configure(section);
 				this.add(name, connection);
 			}
-			
 			
 		}
 	}

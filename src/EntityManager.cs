@@ -41,7 +41,7 @@ namespace Elberos.Orm{
 			return this.connections;
 		}
 		
-		public virtual object getEntityType(dynamic class_name){
+		public virtual EntityBaseType getEntityType(dynamic class_name){
 			if (class_name is string){
 				class_name = Type.GetType(class_name);
 			}
@@ -55,7 +55,7 @@ namespace Elberos.Orm{
 			object obj = Activator.CreateInstance(class_name);
 			if (obj is EntityBaseType){
 				this.types.Add(class_name, obj);
-				return obj;
+				return (EntityBaseType)obj;
 			}
 			
 			return null;
@@ -80,6 +80,24 @@ namespace Elberos.Orm{
 		public EntityRepository getRepository(dynamic entity_repository_name){
 			if (entity_repository_name is string){
 				entity_repository_name = Type.GetType(entity_repository_name);
+			}
+			
+			if (entity_repository_name is Type){
+				
+				// Check if entity_repository_name is subclass of EntityRepository
+				if (!((Type)entity_repository_name).IsSubclassOf(typeof(EntityRepository))){
+					throw new System.Exception("entity_repository_name '" + 
+						(string)entity_repository_name + "' must be EntityRepository");
+				}
+				
+				EntityRepository obj = (EntityRepository)
+						Activator.CreateInstance(entity_repository_name);
+				
+				return obj;
+			}
+			else {
+				throw new System.Exception("entity_repository_name '" + 
+					(string)entity_repository_name + "' must be Type");
 			}
 			
 			return null;
@@ -111,16 +129,13 @@ namespace Elberos.Orm{
 		public virtual QueryBuilder select(dynamic entity_repository_name, string[] fields = null, 
 				string alias_name = null, string connection_name = null){
 			
-			if (entity_repository_name is string){
-				entity_repository_name = Type.GetType(entity_repository_name);
+			Connection connection = this.connections.get(connection_name);
+			if (connection == null){
+				throw new System.Exception("Connection '" + connection_name + "' not found!");
 			}
 			
-			Connection connection = this.connections.get(connection_name);
 			QueryBuilder qb = connection.createQueryBuilder();
-			
-			qb.select(fields);
-			qb.setAlias(alias_name);
-			qb.setEntityRepository(entity_repository_name);
+			qb.select(fields).from(entity_repository_name, alias_name);
 			
 			return qb;
 		}

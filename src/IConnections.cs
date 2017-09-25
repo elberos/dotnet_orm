@@ -18,6 +18,6 @@ namespace Elberos.Orm{
 		void remove(string api_name);
 		Connection get(string api_name);
 		
-		void Configure(IConfiguration config);
+		void Configure(IConfigurationSection config);
 	}
 }
